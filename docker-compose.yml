@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  backend:
+    container_name: laravel-admin-api
+    image: laravel-admin-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - php:7.3
+        - laravel-admin-api:latest
+    environment:
+      DB_HOST: database
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - .:/var/www/html
+    ports:
+      - '8000:8000'
+    depends_on:
+      - database
+    networks:
+      - admin-network
+
+  database:
+    container_name: laravel-admin-db
+    image: mysql:5.7.22
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./storage/framework/database:/var/lib/mysql
+    ports:
+      - '${DB_PORT}:3306'
+    networks:
+      - admin-network
+
+networks:
+  admin-network:
